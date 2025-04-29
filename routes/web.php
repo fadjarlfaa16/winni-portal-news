@@ -8,6 +8,10 @@ Route::get('/', function () {
     return Inertia::render('index');
 })->name('home');
 
+Route::get('/{any}', function () {
+    return Inertia::render('index');
+})->where('any', '.*');
+
 Route::get('/post/{slug}', [PostController::class, 'show']);
 
 

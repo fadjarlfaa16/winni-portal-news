@@ -35,7 +35,7 @@ export default function Carousel() {
     };
 
     return (
-        <div className="relative h-[380px] w-full overflow-hidden">
+        <div className="relative h-[45vh] w-full overflow-hidden md:h-[380px]">
             <div
                 className="flex h-full w-full"
                 style={{
