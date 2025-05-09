@@ -12,7 +12,7 @@ const Home = () => {
             <div className="mx-auto max-w-6xl px-4">
                 <div className="flex flex-row gap-4">
                     {/* NewsList */}
-                    <div className="min-w-0 flex-1">
+                    <div className="mt-10">
                         <NewsList />
                     </div>
 

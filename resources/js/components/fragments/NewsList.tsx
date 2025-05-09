@@ -47,13 +47,13 @@ export const ListOfNews = ({ news }: { news?: NewsItem[] }) => {
     return (
         <div className="w-full">
             {displayNews.map((item) => (
-                <div key={item.id} className="mb-4 flex overflow-hidden rounded-lg bg-white md:flex-row">
+                <div key={item.id} className="flex overflow-hidden rounded-lg bg-white md:flex-row">
                     {item.imageUrl && (
-                        <div className="max-h-[200px] w-full content-center items-center md:w-[40%]">
+                        <div className="mt-[-15px] max-h-[180px] w-full content-center items-center md:w-[40%]">
                             <img src={item.imageUrl} alt={item.title} className="w-full object-cover py-4 md:h-full" />
                         </div>
                     )}
-                    <div className="flex w-full flex-col content-center items-center justify-center px-4 pl-2 text-left md:w-[60%] lg:py-4">
+                    <div className="mt-[-15px] flex w-full flex-col content-center items-center justify-center px-4 pl-2 text-left md:w-[50%]">
                         <div>
                             <h3 className="w-full cursor-pointer text-[8.5pt] font-bold text-gray-800 transition-colors hover:text-blue-600 md:text-lg lg:mb-2">
                                 {item.title}

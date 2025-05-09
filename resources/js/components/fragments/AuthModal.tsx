@@ -37,7 +37,7 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
                         method: 'GET',
                         headers: {
                             'Content-Type': 'application/json',
-                            Authorization: `Bearer ${data.token}`, // <-- Ini yang penting
+                            Authorization: `Bearer ${data.token}`,
                         },
                     });
 
@@ -53,7 +53,7 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
 
                 login(data.token, userName);
                 alert('Login/Register Successful!');
-                onClose(); // Close Modal
+                onClose(); 
             } else {
                 alert('Failed! Please try again.');
             }
