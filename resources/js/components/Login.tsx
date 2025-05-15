@@ -36,23 +36,34 @@ const LoginPage = () => {
     };
 
     return (
-        <div className="relative h-screen w-screen bg-white lg:flex">
-            {/* ✅ KIRI - DESKTOP */}
-            <div className="hidden items-end justify-center bg-[#4d81a9] lg:flex lg:w-1/2">
-                <img src={Pers} alt="Pers" className="w-[95%] max-w-[750px] min-w-[450px] object-contain duration-200 ease-in-out hover:scale-105" />
+        <div className="relative h-screen w-screen overflow-hidden bg-white">
+            <div className="flex h-full lg:flex">
+                {/* Left Side (Image) */}
+                <div className="hidden w-1/2 items-end justify-center overflow-hidden bg-[#4d81a9] lg:flex">
+                    <div className="w-full overflow-hidden">
+                        <img
+                            src={Pers}
+                            alt="Pers"
+                            className="w-full max-w-full origin-center object-contain transition-transform duration-300 ease-in-out hover:scale-102"
+                            style={{ willChange: 'transform' }}
+                        />
+                    </div>
+                </div>
+
+                {/* Right Side (Form) */}
+                <div className="hidden w-1/2 flex-shrink-0 items-center justify-center bg-white lg:flex">
+                    <div className="w-full max-w-md px-4">
+                        <SignInForm email={email} password={password} setEmail={setEmail} setPassword={setPassword} handleSubmit={handleSubmit} />
+                    </div>
+                </div>
             </div>
 
-            {/* ✅ KANAN - DESKTOP */}
-            <div className="hidden items-center justify-center bg-white lg:flex lg:w-1/2">
-                <SignInForm email={email} password={password} setEmail={setEmail} setPassword={setPassword} handleSubmit={handleSubmit} />
-            </div>
-
-            {/* ✅ MOBILE/TABLET - FULL BACKGROUND + GAMBAR */}
-            <div className="absolute inset-0 z-0 flex items-end justify-center bg-[#4d81a9] lg:hidden">
-                <img src={Pers} alt="Pers" className="w-[95%] max-w-[650px] object-contain lg:hidden" />
+            {/* Mobile View */}
+            <div className="absolute inset-0 z-0 flex items-end justify-center overflow-hidden bg-[#4d81a9] lg:hidden">
+                <img src={Pers} alt="Pers" className="w-full max-w-full object-contain" />
             </div>
             <div className="relative z-10 flex h-full w-full items-center justify-center px-4 lg:hidden">
-                <SignInForm email={email} password={password} setEmail={setEmail} setPassword={setPassword} handleSubmit={handleSubmit} />{' '}
+                <SignInForm email={email} password={password} setEmail={setEmail} setPassword={setPassword} handleSubmit={handleSubmit} />
             </div>
         </div>
     );

@@ -13,24 +13,27 @@ class User extends Eloquent implements AuthenticatableContract, JWTSubject
 {
     use HasFactory, Notifiable, Authenticatable;
 
+    protected $primaryKey = 'id';
+    public $incrementing = false;
+    protected $keyType = 'string';
+
     protected $fillable = [
-        'name',
+        'username',
         'email',
         'password',
+        'profile',
+        'is_verified'
+    ];
+
+    protected $casts = [
+        'email_verified_at' => 'datetime',
+        'profile' => 'array',
     ];
 
     protected $hidden = [
         'password',
         'remember_token',
     ];
-
-    protected function casts(): array
-    {
-        return [
-            'email_verified_at' => 'datetime',
-            'password' => 'hashed',
-        ];
-    }
 
     public function getJWTIdentifier()
     {

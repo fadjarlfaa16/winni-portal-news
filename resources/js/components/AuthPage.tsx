@@ -13,10 +13,11 @@ const AuthPage = () => {
 
     const isRegister = location.pathname === '/register';
 
-    const [name, setName] = useState('');
+    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [isVerified, setIsverified] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -28,7 +29,21 @@ const AuthPage = () => {
             return;
         }
 
-        const body = isRegister ? { name, email, password } : { email, password };
+        const body = isRegister
+            ? {
+                  username,
+                  email,
+                  password,
+                  confirmPassword,
+                  profile: {
+                      fullname: '',
+                      profilePath: '',
+                      birth: null,
+                      domicile: '',
+                  },
+                  isVerified: false,
+              }
+            : { email, password };
 
         const res = await fetch(`${API_BASE_URL}${endpoint}`, {
             method: 'POST',
@@ -46,7 +61,7 @@ const AuthPage = () => {
                 const meData = await meRes.json();
                 login(data.token, meData.name || 'Unknown');
             } else {
-                login(data.token, name || 'Unknown');
+                login(data.token, username || 'Unknown');
             }
             navigate('/');
         } else {
@@ -65,11 +80,13 @@ const AuthPage = () => {
             <div className="hidden items-center justify-center bg-white lg:flex lg:w-1/2">
                 {isRegister ? (
                     <RegisterForm
-                        name={name}
+                        username={username}
                         email={email}
                         password={password}
+                        isVerified={isVerified}
                         confirmPassword={confirmPassword}
-                        setName={setName}
+                        setUsername={setUsername}
+                        setIsVerified={setIsverified}
                         setEmail={setEmail}
                         setPassword={setPassword}
                         setConfirmPassword={setConfirmPassword}
@@ -87,13 +104,15 @@ const AuthPage = () => {
             <div className="relative z-10 flex h-full w-full items-center justify-center px-4 lg:hidden">
                 {isRegister ? (
                     <RegisterForm
-                        name={name}
+                        username={username}
                         email={email}
                         password={password}
+                        isVerified={isVerified}
                         confirmPassword={confirmPassword}
-                        setName={setName}
+                        setUsername={setUsername}
                         setEmail={setEmail}
                         setPassword={setPassword}
+                        setIsVerified={setIsverified}
                         setConfirmPassword={setConfirmPassword}
                         handleSubmit={handleSubmit}
                     />

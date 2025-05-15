@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         setUserName(user);
         localStorage.setItem('token', newToken);
         localStorage.setItem('userName', user);
-        showToast('Login berhasil!'); // ✅ show toast
+        showToast('Login berhasil!');
     };
 
     const logout = () => {

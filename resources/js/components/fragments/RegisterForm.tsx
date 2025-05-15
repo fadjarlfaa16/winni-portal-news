@@ -1,41 +1,55 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+
+interface UserProfile {
+    fullname: string;
+    profilePath: string;
+    birth: Date;
+    domicile: string;
+}
+
 interface RegisterFormProps {
-    name: string;
     email: string;
     password: string;
+    username: string;
+    profile?: UserProfile;
+    isVerified: boolean;
     confirmPassword: string;
-    setName: (value: string) => void;
+    setUsername: (value: string) => void;
     setEmail: (value: string) => void;
     setPassword: (value: string) => void;
     setConfirmPassword: (value: string) => void;
+    setProfile?: (value: UserProfile) => void;
+    setIsVerified: (value: boolean) => void;
     handleSubmit: (e: React.FormEvent) => void;
 }
 
 const RegisterForm: React.FC<RegisterFormProps> = ({
-    name,
+    username,
     email,
     password,
     confirmPassword,
-    setName,
+    setUsername,
     setEmail,
     setPassword,
+    setIsVerified,
     setConfirmPassword,
     handleSubmit,
 }) => {
     const navigate = useNavigate();
+
     return (
         <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-lg">
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                        Full Name
+                    <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+                        Username
                     </label>
                     <input
                         type="text"
-                        id="name"
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        id="username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
                         placeholder="John Doe"
                         className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                     />
