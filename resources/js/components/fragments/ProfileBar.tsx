@@ -1,17 +1,19 @@
 import { useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import useOutsideClick from '../../hooks/useOutsideClicks';
 
 interface ProfileBarProps {
     isAuthenticated: boolean;
     userName: string | null;
     logout: () => void;
-    setOpenAuthModal: (value: boolean) => void;
+    // setOpenAuthModal: (value: boolean) => void;
+    isVerified?: boolean;
 }
 
-const ProfileBar = ({ isAuthenticated, userName, logout, setOpenAuthModal }: ProfileBarProps) => {
+const ProfileBar = ({ isAuthenticated, userName, logout, isVerified }: ProfileBarProps) => {
     const [menuOpen, setMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
+    const navigate = useNavigate();
 
     useOutsideClick(menuRef, () => setMenuOpen(false));
 
@@ -48,11 +50,16 @@ const ProfileBar = ({ isAuthenticated, userName, logout, setOpenAuthModal }: Pro
                             ref={menuRef}
                             className="ring-opacity-1 absolute right-0 z-50 mt-12 w-56 rounded-md bg-white py-3 shadow-lg ring-1 ring-black"
                         >
+                            {isVerified && (
+                                <button
+                                    onClick={() => { setMenuOpen(false); navigate('/writer-dashboard'); }}
+                                    className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100"
+                                >
+                                    Dashboard
+                                </button>
+                            )}
                             <button onClick={handleLogout} className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100">
                                 Settings
-                            </button>
-                            <button onClick={handleLogout} className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100">
-                                Dark Mode
                             </button>
                             <button onClick={handleLogout} className="block w-full px-4 py-2 text-left text-sm text-gray-700 hover:bg-gray-100">
                                 Logout

@@ -34,7 +34,6 @@ const AuthPage = () => {
                   username,
                   email,
                   password,
-                  confirmPassword,
                   profile: {
                       fullname: '',
                       profilePath: '',
@@ -45,27 +44,37 @@ const AuthPage = () => {
               }
             : { email, password };
 
-        const res = await fetch(`${API_BASE_URL}${endpoint}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(body),
-        });
+        try {
+            const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body),
+            });
 
-        const data = await res.json();
+            const data = await res.json();
 
-        if (data.token) {
-            if (!isRegister) {
-                const meRes = await fetch(`${API_BASE_URL}/api/me`, {
-                    headers: { Authorization: `Bearer ${data.token}` },
-                });
-                const meData = await meRes.json();
-                login(data.token, meData.name || 'Unknown');
+            if (res.ok && data.success && data.token) {
+                if (!isRegister) {
+                    const meRes = await fetch(`${API_BASE_URL}/api/me`, {
+                        headers: { Authorization: `Bearer ${data.token}` },
+                    });
+                    const meData = await meRes.json();
+                    if (meData.success) {
+                        login(data.token, data.user.username || 'Unknown', data.user.is_verified);
+                    } else {
+                        login(data.token, data.user.username || 'Unknown', data.user.is_verified);
+                    }
+                } else {
+                    login(data.token, data.user.username || 'Unknown', data.user.is_verified);
+                }
+                navigate('/');
             } else {
-                login(data.token, username || 'Unknown');
+                const errorMessage = data.message || data.errors || `${isRegister ? 'Register' : 'Login'} failed`;
+                alert(typeof errorMessage === 'object' ? JSON.stringify(errorMessage) : errorMessage);
             }
-            navigate('/');
-        } else {
-            alert(`${isRegister ? 'Register' : 'Login'} failed`);
+        } catch (error) {
+            console.error('Auth error:', error);
+            alert(`Network error: ${error instanceof Error ? error.message : 'Unknown error'}`);
         }
     };
 

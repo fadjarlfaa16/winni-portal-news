@@ -13,6 +13,7 @@ class User extends Eloquent implements AuthenticatableContract, JWTSubject
 {
     use HasFactory, Notifiable, Authenticatable;
 
+    protected $collection = 'users';
     protected $primaryKey = 'id';
     public $incrementing = false;
     protected $keyType = 'string';

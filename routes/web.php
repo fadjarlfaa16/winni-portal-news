@@ -1,9 +1,8 @@
 <?php
 
+use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use App\Http\Controllers\PostController;
-
 Route::get('/', function () {
     return Inertia::render('index');
 })->name('home');
@@ -11,9 +10,6 @@ Route::get('/', function () {
 Route::get('/{any}', function () {
     return Inertia::render('index');
 })->where('any', '.*');
-
-Route::get('/post/{slug}', [PostController::class, 'show']);
-
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {

@@ -8,76 +8,160 @@ use Illuminate\Support\Facades\Hash;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
     public function register(Request $req)
     {
-        $requestData = $req->all();
-        $requestData['is_verified'] = false;
-
-        $req->validate([
-            'username' => 'required|string|unique:users,username',
-            'email' => 'required|email|unique:users,email',
+        \Log::info('Register request received', $req->all());
+        
+        $validator = Validator::make($req->all(), [
+            'username' => 'required|string|min:3|max:50',
+            'email' => 'required|email',
             'password' => 'required|min:6'
         ]);
 
-        $user = User::create([
-            'id' => (string) Str::uuid(),
-            'username' => $req->username,
-            'email' => $req->email,
-            'password' => Hash::make($req->password),
-            'profile' => [
+        if ($validator->fails()) {
+            \Log::error('Validation failed', $validator->errors()->toArray());
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Check if user already exists
+        try {
+            $existingUser = User::where('email', $req->email)->orWhere('username', $req->username)->first();
+            if ($existingUser) {
+                \Log::warning('User already exists', ['email' => $req->email, 'username' => $req->username]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'User with this email or username already exists'
+                ], 422);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Error checking existing user', ['error' => $e->getMessage()]);
+        }
+
+        try {
+            $user = new User();
+            $user->id = (string) Str::uuid();
+            $user->username = $req->username;
+            $user->email = $req->email;
+            $user->password = Hash::make($req->password);
+            $user->profile = [
                 'fullname' => '',
                 'profilePath' => '',
                 'birth' => null,
                 'domicile' => ''
-            ],
-            'is_verified' => false
-        ]);
+            ];
+            $user->is_verified = false;
+            $user->save();
 
-        $token = JWTAuth::fromUser($user); // <-- Correct way to generate token from user
-        return response()->json(compact('user', 'token'));
+            \Log::info('User created successfully', ['user_id' => $user->id]);
+
+            $token = JWTAuth::fromUser($user);
+            
+            return response()->json([
+                'success' => true,
+                'user' => $user,
+                'token' => $token
+            ], 201);
+        } catch (\Exception $e) {
+            \Log::error('Registration failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Registration failed',
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     public function login(Request $req)
     {
-        $credentials = $req->only('email', 'password');
+        \Log::info('Login request received', ['email' => $req->email]);
+        
+        $validator = Validator::make($req->all(), [
+            'email' => 'required|email',
+            'password' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            \Log::error('Login validation failed', $validator->errors()->toArray());
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
 
         try {
             $user = User::where('email', $req->email)->first();
 
-            if (!$user || !Hash::check($req->password, $user->password)) {
-                return response()->json(['error' => 'Unauthorized'], 401);
+            if (!$user) {
+                \Log::warning('User not found', ['email' => $req->email]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid credentials'
+                ], 401);
+            }
+
+            if (!Hash::check($req->password, $user->password)) {
+                \Log::warning('Invalid password', ['email' => $req->email]);
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid credentials'
+                ], 401);
             }
 
             $token = JWTAuth::fromUser($user);
+            \Log::info('Login successful', ['user_id' => $user->id]);
 
-            return response()->json(compact('token', 'user'));
+            return response()->json([
+                'success' => true,
+                'user' => $user,
+                'token' => $token
+            ]);
         } catch (JWTException $e) {
-            return response()->json(['error' => 'Could not create token'], 500);
+            \Log::error('JWT error during login', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Could not create token',
+                'error' => $e->getMessage()
+            ], 500);
+        } catch (\Exception $e) {
+            \Log::error('Login error', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Login failed',
+                'error' => $e->getMessage()
+            ], 500);
         }
-
-        return response()->json(compact('token'));
     }
 
     public function me()
     {
         try {
             $user = JWTAuth::parseToken()->authenticate();
-            return response()->json($user);
+            return response()->json([
+                'success' => true,
+                'user' => $user
+            ]);
         } catch (JWTException $e) {
-            return response()->json(['error' => 'Token invalid'], 401);
+            return response()->json([
+                'success' => false,
+                'message' => 'Token invalid'
+            ], 401);
         }
     }
 
     public function logout()
     {
         try {
-            JWTAuth::invalidate(JWTAuth::getToken()); // <-- Correct way to invalidate token
-            return response()->json(['message' => 'Logged out']);
+            JWTAuth::invalidate(JWTAuth::getToken());
+            return response()->json([
+                'success' => true,
+                'message' => 'Logged out successfully'
+            ]);
         } catch (JWTException $e) {
-            return response()->json(['error' => 'Failed to logout'], 500);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to logout'
+            ], 500);
         }
     }
 }

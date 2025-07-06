@@ -32,7 +32,6 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
                 let userName = '';
 
                 if (isLoginMode) {
-                    // GET /api/me dengan Authorization header
                     const meRes = await fetch(`${API_BASE_URL}/api/me`, {
                         method: 'GET',
                         headers: {
@@ -51,9 +50,9 @@ const AuthModal = ({ onClose }: AuthModalProps) => {
                     userName = name || 'Unknown';
                 }
 
-                login(data.token, userName);
+                login(data.token, userName, data.user.is_verified);
                 alert('Login/Register Successful!');
-                onClose(); 
+                onClose();
             } else {
                 alert('Failed! Please try again.');
             }

@@ -5,7 +5,7 @@ import ProfileBar from './ProfileBar';
 
 const Navbar = () => {
     const [openAuthModal, setOpenAuthModal] = useState(false);
-    const { isAuthenticated, userName, logout } = useAuth();
+    const { isAuthenticated, userName, logout, isVerified } = useAuth();
 
     return (
         <>
@@ -14,7 +14,12 @@ const Navbar = () => {
                     <h2 className="font-sans font-extrabold text-white">WinniNews</h2>
                 </div>
 
-                <ProfileBar isAuthenticated={isAuthenticated} userName={userName} logout={logout} setOpenAuthModal={setOpenAuthModal} />
+                <ProfileBar
+                    isAuthenticated={isAuthenticated}
+                    userName={userName}
+                    logout={logout}
+                    isVerified={isVerified}
+                />
             </div>
 
             {openAuthModal && <AuthModal onClose={() => setOpenAuthModal(false)} />}
