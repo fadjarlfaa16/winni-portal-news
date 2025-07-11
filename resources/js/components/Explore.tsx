@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
 import ExploresFilter from './fragments/ExploresFilter';
-import { ListOfNews, NewsItem, dummyNews } from './fragments/NewsList';
-import { useAuth } from '../context/AuthContext';
+import { ListOfNews } from './fragments/NewsList';
 
 interface RealNewsItem {
-    _id: string;
+    id: string;
     title: string;
     urlImage: string;
     content: string;
@@ -18,28 +17,22 @@ interface RealNewsItem {
 
 const Explore = () => {
     const [searchInput, setSearchInput] = useState('');
-    const [searchQuery, setSearchQuery] = useState(''); // new state for "real search"
-    const [filteredNews, setFilteredNews] = useState<any[]>([]);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filteredNews, setFilteredNews] = useState<RealNewsItem[]>([]);
     const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
-    const [appliedGenres, setAppliedGenres] = useState<string[]>([]); // new state for "real filter"
+    const [appliedGenres, setAppliedGenres] = useState<string[]>([]);
     const [realNews, setRealNews] = useState<RealNewsItem[]>([]);
+    const [topics, setTopics] = useState<string[]>([]);
     const [loading, setLoading] = useState(false);
-    const { token } = useAuth();
 
-    // Fetch real news data
+    // Fetch news (published only, public)
     useEffect(() => {
         const fetchNews = async () => {
-            if (!token) return;
-            
             setLoading(true);
             try {
                 const response = await fetch('/api/news', {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                 });
-
                 if (response.ok) {
                     const data = await response.json();
                     setRealNews(data);
@@ -51,40 +44,52 @@ const Explore = () => {
                 setLoading(false);
             }
         };
-
         fetchNews();
-    }, [token]);
+    }, []);
 
-    const handleSearchAndFilter = () => {
-        let results: any[] = realNews.length > 0 ? realNews : dummyNews;
+    // Fetch topics
+    useEffect(() => {
+        const fetchTopics = async () => {
+            try {
+                const response = await fetch('/api/topics', {
+                    headers: { 'Content-Type': 'application/json' },
+                });
+                if (response.ok) {
+                    const data = await response.json();
+                    // data bisa array of object, ambil nama/topik
+                    setTopics(Array.isArray(data) ? data.map((t: any) => t.name || t) : []);
+                }
+            } catch (error) {
+                console.error('Failed to fetch topics:', error);
+            }
+        };
+        fetchTopics();
+    }, []);
 
+    // Filtering logic
+    useEffect(() => {
+        let results = [...realNews];
+        // Filter by topic
         if (appliedGenres.length > 0) {
-            results = results.filter((news) => {
-                const genre = '_id' in news ? (news.topic && news.topic.length > 0 ? news.topic[0] : 'General') : news.genre;
-                return appliedGenres.includes(genre);
-            });
-        }
-
-        if (searchQuery.trim() !== '') {
-            results = results.filter(
-                (news) =>
-                    news.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    news.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                    news.author.toLowerCase().includes(searchQuery.toLowerCase()),
+            results = results.filter(news =>
+                news.topic && news.topic.some(t => appliedGenres.includes(t))
             );
         }
-
+        // Search by title only
+        if (searchQuery.trim() !== '') {
+            results = results.filter(news =>
+                news.title.toLowerCase().includes(searchQuery.toLowerCase())
+            );
+        }
         setFilteredNews(results);
-    };
+    }, [searchQuery, appliedGenres, realNews]);
 
     const handleSearchButtonClick = () => {
-        setSearchQuery(searchInput); // Set the "confirmed" search input
-        setTimeout(handleSearchAndFilter, 0); // Apply after updating state
+        setSearchQuery(searchInput);
     };
 
     const handleApplyFilterButtonClick = () => {
-        setAppliedGenres(selectedGenres); // Set the "confirmed" genre
-        setTimeout(handleSearchAndFilter, 0); // Apply after updating state
+        setAppliedGenres(selectedGenres);
     };
 
     return (
@@ -92,7 +97,7 @@ const Explore = () => {
             <div className="mb-6 flex items-center justify-center gap-2">
                 <input
                     type="text"
-                    placeholder="Search news..."
+                    placeholder="Search news by title..."
                     className="w-full max-w-2xl rounded-lg border border-gray-300 p-3 text-sm focus:border-blue-500 focus:outline-none"
                     value={searchInput}
                     onChange={(e) => setSearchInput(e.target.value)}
@@ -124,6 +129,7 @@ const Explore = () => {
                             selectedGenres={selectedGenres}
                             setSelectedGenres={setSelectedGenres}
                             applyFilter={handleApplyFilterButtonClick}
+                            topics={topics}
                         />
                     </div>
                 </div>

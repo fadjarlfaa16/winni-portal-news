@@ -68,7 +68,7 @@ const NewsPlaceholder = () => {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
                     <p className="mt-4 text-gray-600">Loading news...</p>
@@ -79,7 +79,7 @@ const NewsPlaceholder = () => {
 
     if (error || !news) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+            <div className="min-h-screen flex items-center justify-center">
                 <div className="text-center">
                     <div className="text-red-500 text-6xl mb-4">📰</div>
                     <h2 className="text-2xl font-bold text-gray-800 mb-2">News Not Found</h2>
@@ -96,10 +96,10 @@ const NewsPlaceholder = () => {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen">
             {/* Header with back button */}
             <div className="bg-white shadow-sm border-b">
-                <div className="max-w-4xl mx-auto px-4 py-4">
+                <div className="max-w-4xl ml-5 py-4">
                     <button
                         onClick={handleBackClick}
                         className="flex items-center gap-2 text-gray-600 hover:text-gray-800 transition-colors"
@@ -113,9 +113,9 @@ const NewsPlaceholder = () => {
             </div>
 
             {/* Main Content */}
-            <div className="max-w-4xl mx-auto px-4 py-8">
+            <div className="mx-auto ">
                 {/* Article Header */}
-                <div className="bg-white rounded-xl shadow-lg overflow-hidden mb-8">
+                <div className="bg-white shadow-lg overflow-hidden mb-8">
                     {/* Hero Image */}
                     <div className="relative h-96 w-full">
                         <img
@@ -158,18 +158,13 @@ const NewsPlaceholder = () => {
                                 </svg>
                                 <span>{formatDate(news.created_at)}</span>
                             </div>
-                            <div className="flex items-center gap-2">
-                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                </svg>
-                                <span>{news.likeCount || 0} likes</span>
-                            </div>
+
                         </div>
 
                         {/* Topics */}
                         {news.topic && news.topic.length > 0 && (
                             <div className="mb-6">
-                                <h3 className="text-sm font-semibold text-gray-700 mb-2">Topics:</h3>
+                                <h3 className="text-left text-sm font-semibold text-gray-700 mb-2">Topics:</h3>
                                 <div className="flex flex-wrap gap-2">
                                     {news.topic.map((topic, index) => (
                                         <span
@@ -186,9 +181,9 @@ const NewsPlaceholder = () => {
                 </div>
 
                 {/* Article Content */}
-                <div className="bg-white rounded-xl shadow-lg p-8">
+                <div className="bg-white p-8">
                     <div className="prose prose-lg max-w-none">
-                        <div className="text-gray-800 leading-relaxed text-lg whitespace-pre-wrap">
+                        <div className="text-justify text-gray-800 leading-relaxed text-lg whitespace-pre-wrap">
                             {news.content}
                         </div>
                     </div>
@@ -200,7 +195,7 @@ const NewsPlaceholder = () => {
                                 <span>Last updated: {formatDate(news.updated_at)}</span>
                             </div>
                             <div className="flex items-center gap-4">
-                                <button className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors">
+                                {/* <button className="flex items-center gap-2 text-gray-600 hover:text-blue-600 transition-colors">
                                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
                                     </svg>
@@ -211,7 +206,7 @@ const NewsPlaceholder = () => {
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                                     </svg>
                                     Like ({news.likeCount || 0})
-                                </button>
+                                </button> */}
                             </div>
                         </div>
                     </div>

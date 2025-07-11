@@ -54,19 +54,23 @@ const AuthPage = () => {
             const data = await res.json();
 
             if (res.ok && data.success && data.token) {
-                if (!isRegister) {
-                    const meRes = await fetch(`${API_BASE_URL}/api/me`, {
+                let usernameToUse = data.user.username || 'Unknown';
+                let isVerifiedToUse = data.user.is_verified;
+                login(data.token, usernameToUse, isVerifiedToUse);
+
+                // Fetch profile and save to localStorage
+                try {
+                    const profileRes = await fetch(`${API_BASE_URL}/api/profile`, {
                         headers: { Authorization: `Bearer ${data.token}` },
                     });
-                    const meData = await meRes.json();
-                    if (meData.success) {
-                        login(data.token, data.user.username || 'Unknown', data.user.is_verified);
-                    } else {
-                        login(data.token, data.user.username || 'Unknown', data.user.is_verified);
+                    if (profileRes.ok) {
+                        const profileData = await profileRes.json();
+                        localStorage.setItem('profile', JSON.stringify(profileData));
                     }
-                } else {
-                    login(data.token, data.user.username || 'Unknown', data.user.is_verified);
+                } catch (e) {
+                    // ignore error
                 }
+
                 navigate('/');
             } else {
                 const errorMessage = data.message || data.errors || `${isRegister ? 'Register' : 'Login'} failed`;

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useOutsideClick from '../../hooks/useOutsideClicks';
 
@@ -6,7 +6,6 @@ interface ProfileBarProps {
     isAuthenticated: boolean;
     userName: string | null;
     logout: () => void;
-    // setOpenAuthModal: (value: boolean) => void;
     isVerified?: boolean;
 }
 
@@ -14,8 +13,24 @@ const ProfileBar = ({ isAuthenticated, userName, logout, isVerified }: ProfileBa
     const [menuOpen, setMenuOpen] = useState(false);
     const menuRef = useRef<HTMLDivElement>(null);
     const navigate = useNavigate();
+    const [profilePath, setProfilePath] = useState<string | null>(null);
 
     useOutsideClick(menuRef, () => setMenuOpen(false));
+
+    useEffect(() => {
+        // Ambil profilePath dari localStorage (disimpan saat update profile)
+        const profile = localStorage.getItem('profile');
+        if (profile) {
+            try {
+                const parsed = JSON.parse(profile);
+                setProfilePath(parsed.profilePath || null);
+            } catch {
+                setProfilePath(null);
+            }
+        } else {
+            setProfilePath(null);
+        }
+    }, [isAuthenticated]);
 
     const handleLogout = () => {
         logout();
@@ -30,17 +45,30 @@ const ProfileBar = ({ isAuthenticated, userName, logout, isVerified }: ProfileBa
                 </Link>
             ) : (
                 <div className="relative flex w-full justify-end">
-                    <button onClick={() => setMenuOpen(!menuOpen)} className="text-md font-semibold text-white">
-                        <div className="flex items-center gap-3 hover:cursor-pointer">
-                            <div className="">
+                    <button
+                        onClick={() => setMenuOpen(!menuOpen)}
+                        className="flex items-center gap-3 group focus:outline-none"
+                        aria-label="Open profile menu"
+                    >
+                        <div className="">
+                            {profilePath ? (
                                 <img
-                                    className="h-9 w-9 rounded-full object-cover"
-                                    src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRLk70QNBf9Gc9z_69E5mBPuIuVuJ4k1aWTzg&s"
-                                ></img>
-                            </div>
-                            <div className="hidden sm:block">
-                                <div className="">{userName}</div>
-                                <div className="text-left">User</div>
+                                    className="h-10 w-10 rounded-full object-cover border-2 border-white shadow-md group-hover:ring-2 group-hover:ring-blue-400 transition-all duration-200"
+                                    src={profilePath}
+                                    alt="Profile"
+                                    onError={e => (e.currentTarget.src = 'https://ui-avatars.com/api/?name=User&background=ddd&color=555')}
+                                />
+                            ) : (
+                                <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center text-2xl text-gray-400 border-2 border-white shadow-md group-hover:ring-2 group-hover:ring-blue-400 transition-all duration-200">
+                                    <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 14c3.866 0 7 1.343 7 3v2H5v-2c0-1.657 3.134-3 7-3zm0-2a4 4 0 100-8 4 4 0 000 8z" />
+                                    </svg>
+                                </div>
+                            )}
+                        </div>
+                        <div className="hidden sm:block text-right">
+                            <div className="font-semibold text-white text-base leading-tight group-hover:text-blue-200 transition-colors duration-200">
+                                {userName}
                             </div>
                         </div>
                     </button>

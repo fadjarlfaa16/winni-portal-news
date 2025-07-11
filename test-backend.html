@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Backend Test</title>
+</head>
+<body>
+    <h1>Backend Connection Test</h1>
+    <button onclick="testPosts()">Test Posts API</button>
+    <button onclick="testLogin()">Test Login</button>
+    <div id="result"></div>
+
+    <script>
+        async function testPosts() {
+            try {
+                const res = await fetch('http://127.0.0.1:8000/api/posts');
+                const data = await res.json();
+                document.getElementById('result').innerHTML = 
+                    `<h3>Posts API Response:</h3><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (err) {
+                document.getElementById('result').innerHTML = 
+                    `<h3>Error:</h3><pre>${err.message}</pre>`;
+            }
+        }
+
+        async function testLogin() {
+            try {
+                const res = await fetch('http://127.0.0.1:8000/api/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'test@test.com',
+                        password: 'password'
+                    })
+                });
+                const data = await res.json();
+                document.getElementById('result').innerHTML = 
+                    `<h3>Login API Response:</h3><pre>${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (err) {
+                document.getElementById('result').innerHTML = 
+                    `<h3>Error:</h3><pre>${err.message}</pre>`;
+            }
+        }
+    </script>
+</body>
+</html> 

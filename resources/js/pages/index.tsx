@@ -8,6 +8,7 @@ import { AuthProvider } from '@/context/AuthContext';
 import { ToastProvider } from '@/context/Toast';
 import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import MainLayout from './MainLayout';
+import Profile from '@/components/Profile';
 
 export default function Index() {
     return (
@@ -23,6 +24,7 @@ export default function Index() {
                             <Route path="explore" element={<Explore />} />
                             <Route path="community" element={<Community />} />
                             <Route path="/news/:id" element={<NewsPlaceholder />} />
+                            <Route path='/profile' element={<Profile />} />
                         </Route>
                     </Routes>
                 </Router>

@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Like Test</title>
+</head>
+<body>
+    <h1>Like Feature Test</h1>
+    
+    <div>
+        <h3>Step 0: Create Sample Posts</h3>
+        <button onclick="createSamplePosts()">Create Sample Posts</button>
+        <div id="createResult"></div>
+    </div>
+    
+    <div>
+        <h3>Step 1: Login</h3>
+        <input type="text" id="username" placeholder="Username" value="testuser">
+        <button onclick="setUsername()">Set Username</button>
+        <p>Current username: <span id="currentUser">None</span></p>
+    </div>
+
+    <div>
+        <h3>Step 2: Get Posts</h3>
+        <button onclick="getPosts()">Get Posts</button>
+        <div id="postsList"></div>
+    </div>
+
+    <div>
+        <h3>Step 3: Test Like</h3>
+        <input type="text" id="postId" placeholder="Post ID">
+        <button onclick="testLike()">Test Like</button>
+        <div id="likeResult"></div>
+    </div>
+
+    <script>
+        let currentUsername = '';
+
+        async function createSamplePosts() {
+            try {
+                const res = await fetch('http://127.0.0.1:8000/api/posts/create-sample', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                
+                const data = await res.json();
+                console.log('Create sample posts response:', data);
+                
+                document.getElementById('createResult').innerHTML = `
+                    <h4>Create Result:</h4>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+                
+                if (res.ok) {
+                    // Auto refresh posts list
+                    getPosts();
+                }
+                
+            } catch (err) {
+                document.getElementById('createResult').innerHTML = `
+                    <h4>Error:</h4>
+                    <p style="color: red;">${err.message}</p>
+                `;
+            }
+        }
+
+        function setUsername() {
+            currentUsername = document.getElementById('username').value;
+            document.getElementById('currentUser').textContent = currentUsername;
+            localStorage.setItem('userName', currentUsername);
+        }
+
+        async function getPosts() {
+            try {
+                const res = await fetch('http://127.0.0.1:8000/api/posts');
+                const posts = await res.json();
+                
+                let html = '<h4>Posts:</h4>';
+                posts.forEach(post => {
+                    html += `
+                        <div style="border: 1px solid #ccc; margin: 10px; padding: 10px;">
+                            <strong>ID:</strong> ${post._id}<br>
+                            <strong>Author:</strong> ${post.author}<br>
+                            <strong>Content:</strong> ${post.content}<br>
+                            <strong>Likes:</strong> ${post.likes ? post.likes.length : 0} (${post.likes ? post.likes.join(', ') : 'none'})<br>
+                            <button onclick="testLikeById('${post._id}')">Test Like This Post</button>
+                        </div>
+                    `;
+                });
+                
+                document.getElementById('postsList').innerHTML = html;
+            } catch (err) {
+                document.getElementById('postsList').innerHTML = `<p style="color: red;">Error: ${err.message}</p>`;
+            }
+        }
+
+        async function testLike() {
+            const postId = document.getElementById('postId').value;
+            if (!postId) {
+                alert('Please enter a post ID');
+                return;
+            }
+            await testLikeById(postId);
+        }
+
+        async function testLikeById(postId) {
+            if (!currentUsername) {
+                alert('Please set username first');
+                return;
+            }
+
+            try {
+                const headers = {
+                    'Content-Type': 'application/json',
+                    'X-Username': currentUsername
+                };
+
+                console.log('Like request:', { postId, username: currentUsername, headers });
+
+                const res = await fetch(`http://127.0.0.1:8000/api/posts/${postId}/like`, {
+                    method: 'POST',
+                    headers
+                });
+
+                const data = await res.json();
+                console.log('Like response:', data);
+
+                document.getElementById('likeResult').innerHTML = `
+                    <h4>Like Result:</h4>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+
+                // Refresh posts list
+                getPosts();
+
+            } catch (err) {
+                document.getElementById('likeResult').innerHTML = `
+                    <h4>Error:</h4>
+                    <p style="color: red;">${err.message}</p>
+                `;
+            }
+        }
+
+        // Load username from localStorage on page load
+        window.onload = function() {
+            const savedUsername = localStorage.getItem('userName');
+            if (savedUsername) {
+                currentUsername = savedUsername;
+                document.getElementById('username').value = savedUsername;
+                document.getElementById('currentUser').textContent = savedUsername;
+            }
+        };
+    </script>
+</body>
+</html> 

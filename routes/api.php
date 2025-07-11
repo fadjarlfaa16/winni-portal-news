@@ -4,6 +4,8 @@ use App\Http\Controllers\AuthController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\NewsController;
 use App\Http\Controllers\TopicController;
+use App\Http\Controllers\PostController;
+use App\Http\Controllers\ProfileController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -51,3 +53,19 @@ Route::middleware('auth:api')->group(function () {
 // Topic CRUD
 Route::get('/topics', [TopicController::class, 'index']);
 Route::post('/topics', [TopicController::class, 'store']);
+
+// Post routes - accessible without auth
+Route::get('/posts', [PostController::class, 'index']);
+Route::post('/posts', [PostController::class, 'store']);
+Route::post('/posts/{id}/like', [PostController::class, 'like']);
+Route::post('/posts/{id}/comment', [PostController::class, 'comment']);
+Route::get('/posts/{id}', [PostController::class, 'show']);
+
+// Test route to create sample posts
+Route::post('/posts/create-sample', [PostController::class, 'createSamplePosts']);
+
+// Profile routes - require auth
+Route::middleware('auth:api')->group(function () {
+    Route::get('/profile', [ProfileController::class, 'show']);
+    Route::put('/profile', [ProfileController::class, 'update']);
+});

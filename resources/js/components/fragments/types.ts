@@ -1,5 +1,5 @@
 export interface Article {
-    id?: number;
+    id: string;
     title: string;
     status: string;
     urlImage?: string;
@@ -7,7 +7,7 @@ export interface Article {
     likeCount?: number;
     topic?: string[] | string;
     author?: string;
-    createdAt?: string;
+    created_at?: string;
     updated_at?: string;
 }
 

@@ -53,7 +53,7 @@ const WriterDashboard = () => {
             ...article,
             author: userName,
         };
-        delete payload.createdAt;
+        delete payload.created_at;
         const res = await fetch('/api/news', {
             method: 'POST',
             headers: {
@@ -101,7 +101,7 @@ const WriterDashboard = () => {
             ...updatedArticle,
             author: userName,
         };
-        delete payload.createdAt;
+        delete payload.created_at;
         const res = await fetch(`/api/news/${updatedArticle.id}`, {
             method: 'PUT',
             headers: {
@@ -134,7 +134,7 @@ const WriterDashboard = () => {
         setShowForm(false);
     };
 
-    const handleDelete = async (id?: number) => {
+    const handleDelete = async (id?: string) => {
         if (!id) return;
         if (window.confirm('Are you sure to delete this article?')) {
             const res = await fetch(`/api/news/${id}`, { method: 'DELETE' });
@@ -159,13 +159,15 @@ const WriterDashboard = () => {
     };
 
     // Filtering logic (unchanged)
-    const filteredArticles = articles.filter(article => {
-        const matchesSearch =
-            (article.title && article.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
-            (article.content && article.content.toLowerCase().includes(searchTerm.toLowerCase()));
-        const matchesStatus = filterStatus === 'All' || article.status === filterStatus;
-        return matchesSearch && matchesStatus;
-    });
+    const filteredArticles = articles
+        .filter(article => article.author === userName) // hanya milik user login
+        .filter(article => {
+            const matchesSearch =
+                (article.title && article.title.toLowerCase().includes(searchTerm.toLowerCase())) ||
+                (article.content && article.content.toLowerCase().includes(searchTerm.toLowerCase()));
+            const matchesStatus = filterStatus === 'All' || article.status === filterStatus;
+            return matchesSearch && matchesStatus;
+        });
 
     // Toggle form open/close
     const handleToggleForm = () => {
@@ -223,7 +225,7 @@ const WriterDashboard = () => {
                     />
                 )}
             </div>
-            <DashboardStats articles={articles} />
+            <DashboardStats articles={filteredArticles} />
             {/* Filters */}
             <div className="flex flex-col md:flex-row gap-4 mb-8 mx-5">
                 <div className="flex-1">

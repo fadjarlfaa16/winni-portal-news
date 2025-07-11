@@ -1,13 +1,16 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Article } from './types';
 
 interface ArticleListProps {
     articles: Article[];
     onEdit: (article: Article) => void;
-    onDelete: (id?: number) => void;
+    onDelete: (id?: string) => void;
 }
 
 const ArticleList: React.FC<ArticleListProps> = ({ articles, onEdit, onDelete }) => {
+    const navigate = useNavigate();
+
     if (articles.length === 0) {
         return (
             <div className="text-center py-10">
@@ -27,10 +30,11 @@ const ArticleList: React.FC<ArticleListProps> = ({ articles, onEdit, onDelete })
             {articles.map((article) => (
                 <div
                     key={article.id}
-                    className="flex bg-white overflow-hidden duration-200"
+                    className="flex bg-white overflow-hidden duration-200 cursor-pointer"
+                    onClick={() => navigate(`/news/${article.id}`)}
                 >
                     <img
-                        src={article.urlImage || 'https://via.placeholder.com/120x120'}
+                        src={article.urlImage || 'https://via.placeholder.com/120x400'}
                         alt={article.title}
                         className="w-64 h-32 object-cover flex-shrink-0"
                     />
@@ -40,13 +44,13 @@ const ArticleList: React.FC<ArticleListProps> = ({ articles, onEdit, onDelete })
                             <div className="flex gap-2 mt-1 md:mt-0">
                                 <button
                                     className="text-blue-600 hover:underline text-sm font-medium"
-                                    onClick={() => onEdit(article)}
+                                    onClick={(e) => { e.stopPropagation(); onEdit(article); }}
                                 >
                                     Edit
                                 </button>
                                 <button
                                     className="text-red-600 hover:underline text-sm font-medium"
-                                    onClick={() => onDelete(article.id)}
+                                    onClick={(e) => { e.stopPropagation(); onDelete(article.id); }}
                                 >
                                     Delete
                                 </button>
